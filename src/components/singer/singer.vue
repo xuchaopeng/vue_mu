@@ -10,6 +10,7 @@
 	import {ERR_OK} from 'api/config'
 	import Singer from 'common/js/singer'
 	import ListView from 'base/listview/listview'
+	import {mapMutations} from 'vuex'
 
 	const HOT_NAME = '热门';
 	const HOT_SINGER_LEN = 10 ;
@@ -28,12 +29,13 @@
 				this.$router.push({
 					path:`/singer/${singer.id}`
 				})
+				//实现了对mutation的提交
+				this.setSinger(singer)
 			},
 			_getSingerList(){
 				getSingerList().then((res)=>{
 					if(res.code === ERR_OK){
 						this.singers = this._normalizeSinger(res.singerList.data.singerlist)
-						console.log(this.singers)
 					}
 				})
 			},
@@ -72,7 +74,10 @@
 					val.title === HOT_NAME ? hot.push(map[key]) : ret.push(map[key]);
 				}
 				return hot.concat(ret)
-			}
+			},
+			...mapMutations({
+				setSinger:'SET_SINGER'
+			})
 
 		},
 		components:{
