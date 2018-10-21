@@ -1,6 +1,6 @@
 <template>
 	<transition name="slide">
-		<div class="singer-detail"></div>
+		<MusicList :title="title" :bg-image="bgImage" :songs="songs"></MusicList>
 	</transition>
 </template>
 
@@ -9,6 +9,7 @@
 	import {getSingerDetail} from 'api/singer'
 	import {ERR_OK} from 'api/config'
 	import	{createSong} from 'common/js/song'
+	import MusicList from 'components/music-list/music-list'
 	export default {
 		data(){
 			return {
@@ -16,6 +17,12 @@
 			}
 		},
 		computed:{
+			title(){
+				return this.singer.name
+			},
+			bgImage(){
+				return this.singer.avatar
+			},
 			//在实例中挂载了一个singer属性
 			...mapGetters([
 				'singer'
@@ -33,8 +40,6 @@
 				getSingerDetail(this.singer.id).then((res) => {
 					if(res.code === ERR_OK){
 						this.songs = this._normalizeSongs(res.data.list);
-						console.log(this.songs[0]);
-						console.log(res.data.list[0])
 					}
 				})
 			},
@@ -48,6 +53,9 @@
 				})
 				return ret
 			}
+		},
+		components:{
+			MusicList
 		}
 
 	}
@@ -55,15 +63,6 @@
 
 <style scoped lang="less">
 	@import "~common/less/variable.less";
-	.singer-detail{
-		position: fixed;
-		z-index:100;
-		top:0;
-		left:0;
-		right:0;
-		bottom:0;
-		background: @color-background;
-	}
 	.slide-enter-active,.slide-leave-active{
 		transition: all 0.3s
 	}
