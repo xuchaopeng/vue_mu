@@ -30,7 +30,10 @@
           <div class="progress-wrapper">
             <span class="time time-l">{{format(currentTime)}}</span>
             <div class="progress-bar-wrapper">
-              <ProgressBar :percent="percent"></ProgressBar>
+              <ProgressBar :percent="percent"
+                           @percentChange="onProgressBarChange"
+              >
+              </ProgressBar>
             </div>
             <span class="time time-r">{{format(currentSong.duration)}}</span>
           </div>
@@ -64,7 +67,7 @@
   				<p class="desc"  v-html="currentSong.singer"></p>
   			</div>
   			<div class="control">
-          <i @click.stop="togglePlaying" :class="miniIcon"></i>   
+          <i @click.stop="togglePlaying" :class="miniIcon"></i>
         </div>
   			<div class="control">
   				<i class="icon-playlist"></i>
@@ -206,7 +209,14 @@
         const second = this._pad(interval % 60)
         return `${minute}:${second}`
       },
+      onProgressBarChange(percent){
+        this.$refs.audio.currentTime = this.currentSong.duration * percent
+        if(!this.playing){
+          this.togglePlaying()
+        }
+      },
       _pad(num,n = 2){
+        num = parseInt(num)
         let len = num.toString().length
         while(len < n){
           num = '0'+num

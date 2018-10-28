@@ -38,6 +38,10 @@
 						this.singers = this._normalizeSinger(res.singerList.data.singerlist)
 					}
 				})
+
+				getMusic().then((res)=>{
+					console.log(res)
+				})
 			},
 			_normalizeSinger(list){
 				let map = {
