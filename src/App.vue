@@ -8,7 +8,6 @@
     <Player></Player>
   </div>
 </template>
-
 <script>
   import Mheader from 'components/m-header/m-header';
   import Tab from 'components/tab/tab';
@@ -17,7 +16,7 @@
     components:{
       Mheader,
       Tab,
-      Player
+      Player,
     }
   }
 </script>
