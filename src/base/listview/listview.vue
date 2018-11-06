@@ -56,7 +56,7 @@
 				default:[]
 			}
 		},
-    computed:{
+computed:{
       shortcutList(){
         return this.data.map((group) => {
           return group.title.substr(0,2)
