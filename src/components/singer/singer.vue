@@ -1,95 +1,64 @@
 <template>
-	<div class="singer">
-		<ListView @select="selectSinger" :data="singers"></ListView>
-		<router-view></router-view>
-	</div>
+  <transition name="slide">
+    <music-list :title="title" :bg-image="bgImage" :songs="songs"></music-list>
+  </transition>
 </template>
 
 <script type="text/javascript">
-	import {getSingerList} from 'api/singer'
-	import {ERR_OK} from 'api/config'
-	import Singer from 'common/js/singer'
-	import ListView from 'base/listview/listview'
-	import {mapMutations} from 'vuex'
+  import MusicList from 'components/music-list/music-list'
+  import {getSingerDetail} from 'api/singer'
+  import {ERR_OK} from 'api/config'
+  import {createSong} from 'common/js/song'
+  import {mapGetters} from 'vuex'
 
-	const HOT_NAME = '热门';
-	const HOT_SINGER_LEN = 10 ;
-
-	export default {
-		data(){
-			return {
-				singers:[]
-			}
-		},
-		created(){
-			this._getSingerList()
-		},
-		methods:{
-			selectSinger(singer){
-				this.$router.push({
-					path:`/singer/${singer.id}`
-				})
-				//实现了对mutation的提交
-				this.setSinger(singer)
-			},
-			_getSingerList(){
-				getSingerList().then((res)=>{
-					if(res.code === ERR_OK){
-						this.singers = this._normalizeSinger(res.singerList.data.singerlist)
-					}
-				})
-
-				getMusic().then((res)=>{
-					console.log(res)
-				})
-			},
-			_normalizeSinger(list){
-				let map = {
-					hot:{
-						title:HOT_NAME,
-						items:[]
-					}
-				}
-				list.forEach((item,index) => {
-					if(index < HOT_SINGER_LEN){
-						map.hot.items.push(new Singer({
-							id:item.singer_mid,
-							name:item.singer_name,
-							avatar:item.singer_pic
-						}))
-					}
-					const key = item.country;
-					if(!map[key]){
-						map[key] = {
-							title:key,
-							items:[]
-						}
-					}
-					map[key].items.push(new Singer({
-						id:item.singer_mid,
-						name:item.singer_name,
-						avatar:item.singer_pic
-					}))
-				})
-				let ret = []
-				let hot = []
-				for(let key in map){
-					let val = map[key];
-					val.title === HOT_NAME ? hot.push(map[key]) : ret.push(map[key]);
-				}
-				return hot.concat(ret)
-			},
-			...mapMutations({
-				setSinger:'SET_SINGER'
-			})
-
-		},
-		components:{
-			ListView
-		}
-	}
+  export default {
+    computed: {
+      title() {
+        return this.singer.name
+      },
+      bgImage() {
+        return this.singer.avatar
+      },
+      ...mapGetters([
+        'singer'
+      ])
+    },
+    data() {
+      return {
+        songs: []
+      }
+    },
+    created() {
+      this._getDetail()
+    },
+    methods: {
+      _getDetail() {
+        if (!this.singer.id) {
+          this.$router.push('/singer')
+          return
+        }
+        getSingerDetail(this.singer.id).then((res) => {
+          if (res.code === ERR_OK) {
+            this.songs = this._normalizeSongs(res.data.list)
+          }
+        })
+      },
+      _normalizeSongs(list) {
+        let ret = []
+        list.forEach((item) => {
+          let {musicData} = item
+          if (musicData.songid && musicData.albummid) {
+            ret.push(createSong(musicData))
+          }
+        })
+        return ret
+      }
+    },
+    components: {
+      MusicList
+    }
+  }
 </script>
-
 <style scoped lang="less">
 	.singer{
 		position: fixed;

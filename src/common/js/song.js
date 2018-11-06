@@ -1,5 +1,7 @@
 //参数较多 设计成一个对象类
-
+import {getLyric} from 'api/song'
+import {ERR_OK} from 'api/config'
+import {Base64} from 'js-base64'
 export default class Song {
 	constructor({id,mid,singer,name,albm,duration,image,url}){
 		this.id = id
@@ -11,7 +13,25 @@ export default class Song {
 		this.image = image
 		this.url = url
 	}
+
+	getLyric(){
+		if(this.lyric){
+			return Promise.resolve(this.lyric)
+		}
+		return new Promise((resolve,reject)=>{
+			getLyric(this.mid).then((res) => {
+				if(res.retcode === ERR_OK){
+					this.lyric = Base64.decode(res.lyric)
+					resolve(this.lyric)
+				}else{
+					reject('no lyric')
+				}
+			})
+		})
+	}
 }
+
+
 
 export function createSong(musicData){
 	return new Song({
@@ -30,12 +50,8 @@ export function createSong(musicData){
 function getSongurl(){
 	const ran = parseInt(Math.random()*10000)
 	const songs = [
-		'C400002qU5aY3Qu24y.m4a?guid=2602010120&vkey=7789139248F276BB1E1D21BF83D243FF9421F14B093610177BB2862CA8723BEF8223F3112BD3B2847ED32BEA31D5FB04AA68D936C32780E6&uin=0&fromtag=66',
-		'C400000ryYx71hFmdF.m4a?guid=2602010120&vkey=F445F7FDA8A641AD0546BB097A066B0D9692DA74DF1EA51833FB5DFB583C0833F52E3B143B177F125B16DA63D127160657F3053D286B337B&uin=0&fromtag=66',
-		'C400003UMzjf18kDyK.m4a?guid=2602010120&vkey=9A95C239FB7CC34648D9B1F3BBF9DE667C58E236ADF72E3967550AAED92DC34170D718C88F72780CC88A453C43283837E48A7C4F932914CF&uin=0&fromtag=66',
-		'C400001aExsj3BySSC.m4a?guid=2602010120&vkey=01D14CBFF637876AF8D3E1576DE609C620B020782924193B947857B7900CD60140765B80555EA0FCF0AD769DB992D335CAF3CE59A2AB087F&uin=0&fromtag=66',
-		'C400003H45Js0bEuid.m4a?guid=2602010120&vkey=1B8A45E7C1A0482A4158C085F8A5E22AC2959E629609A42CB2431715AEEA3F0B214B5CB45A8D8A2A9CB06A4A4F5F35AC4D9ED4CD3F06A316&uin=0&fromtag=66',
-		'C400002pLUbY38dqz0.m4a?guid=2602010120&vkey=5B522C603798199C019CB0A2125165868CF269D939683A675B332F5D09A1E12D8F18B11324B74DA2F460EC71547A6C9CD8748DC84807D059&uin=0&fromtag=66'
+		'C400003X1czK36p18l.m4a?guid=2602010120&vkey=5F917FCC6C4E4228B90C75C473C3C205B7E214B2CC1C4C6177D644D54C19A4FB83FE1D016F292A2989B56B0205017E71A0B3ED5C2B70AD7A&uin=0&fromtag=66',
+		'C400003X1czK36p18l.m4a?guid=2602010120&vkey=5F917FCC6C4E4228B90C75C473C3C205B7E214B2CC1C4C6177D644D54C19A4FB83FE1D016F292A2989B56B0205017E71A0B3ED5C2B70AD7A&uin=0&fromtag=66'
 	]
 	const len = songs.length
 	const index = parseInt(Math.random()*len)

@@ -60,6 +60,7 @@ apiRoutes.get('/lyric', function (req, res) {
     }
     res.json(ret)
   }).catch((e) => {
+    res.json({'xcp':'error'})
     console.log(e)
   })
 })
